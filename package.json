@@ -1,0 +1,40 @@
+{
+  "name": "nifti-stream",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Async streaming NIFTI file reader",
+  "scripts": {
+    "build": "node build.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prepare": "npm run build",
+    "dev": "npx http-server . -o demo/index.html --no-clipboard -c-1",
+    "docs": "typedoc"
+  },
+  "types": "./dist/index.d.ts",
+  "module": "dist/index.js",
+  "browser": "dist/nifti-stream.js",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.4.2",
+    "typedoc": "^0.27.3",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
