@@ -2,6 +2,8 @@
 
 A streaming parser for NIFTI-1 and NIFTI-2 neuroimaging files, designed for efficient client-side processing and progressive loading in web applications.
 
+Based on [NIFTI-Reader-JS](https://github.com/rii-mango/NIFTI-Reader-JS).
+
 ## Features
 
 - 🚰 **True Streaming**: Process NIFTI files as they download, no need to wait for complete file
