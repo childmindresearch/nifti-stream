@@ -12,6 +12,10 @@ A streaming parser for NIFTI-1 and NIFTI-2 neuroimaging files, designed for effi
 - 💻 **Browser-Ready**: Works directly in modern browsers
 - 📦 **Lightweight**: Zero dependencies, focused implementation
 
+### Live demo
+
+See our [live demo](https://childmindresearch.github.io/nifti-stream/demo) and check out the [demo source code](https://github.com/childmindresearch/nifti-stream/tree/main/demo).
+
 ## Installation
 
 ```bash
@@ -84,10 +88,6 @@ Stop streaming at any time:
 ```javascript
 await reader.stop();
 ```
-
-### Browser Example
-
-See our [live demo](https://childmindresearch.github.io/nifti-stream/demo) and check out the [demo source code](https://github.com/childmindresearch/nifti-stream/tree/main/demo).
 
 ## API Documentation
 
