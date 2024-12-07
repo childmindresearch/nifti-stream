@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nifti-stream demos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="../dist/nifti-stream.js"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <span class="font-semibold text-gray-700 text-lg">nifti-stream</span>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="https://github.com/yourusername/nifti-stream" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://github.com/yourusername/nifti-stream/docs" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="prose max-w-none mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">nifti-stream Demo</h1>
+            <p class="text-gray-600 mb-4">
+                This demo uses a T1w scan to demonstrate the streaming capabilities. While we're only showing structural data here, 
+                the library handles any n-dimensional NIFTI data you throw at it - your fMRI timeseries, DWI volumes, or 
+                multi-echo sequences will work just fine. Just specify your preferred streaming dimension and you're set.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid gap-8">
+            <!-- Rest of the content remains exactly the same -->
+            <!-- Header Only Demo -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Quick Header Inspection</h2>
+                <p class="text-gray-600 mb-4">
+                    Stream just the header metadata without loading the image data. Perfect for quick inspection
+                    or validation of NIFTI files before processing.
+                </p>
+                <pre id="headerInfo" class="bg-gray-50 p-4 rounded overflow-auto h-48 font-mono text-sm">Click "Load Header" to view NIFTI header information</pre>
+                <button id="loadHeader" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">
+                    Load Header
+                </button>
+            </div>
+
+            <!-- Single Slice Demo -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">2. Selective Slice Loading</h2>
+                <p class="text-gray-600 mb-4">
+                    Load just the middle slice from the volume. This demonstrates how you can selectively 
+                    access parts of the data without loading the entire file.
+                </p>
+                <canvas id="slicePreview" class="bg-gray-200 rounded"></canvas>
+                <button id="loadSlice" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">
+                    Load Middle Slice
+                </button>
+            </div>
+
+            <!-- Progressive Loading Demo -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">3. Progressive Loading</h2>
+                <p class="text-gray-600 mb-4">
+                    Stream all slices progressively, displaying them side by side. This shows how you can process
+                    and display data as it arrives, without waiting for the complete file to load.
+                </p>
+                <div class="overflow-x-auto">
+                    <canvas id="progressiveView" class="bg-gray-200 rounded"></canvas>
+                </div>
+                <div class="mt-4 flex items-center gap-4">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                        <div id="loadingProgress" class="bg-blue-500 h-2 rounded-full transition-all duration-200"></div>
+                    </div>
+                    <span id="sliceCounter" class="text-sm text-gray-600">0/0 slices</span>
+                </div>
+                <div class="mt-4 space-x-2">
+                    <button id="startLoading" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">
+                        Start Loading
+                    </button>
+                    <button id="stopLoading" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">
+                        Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const { NiftiStream } = niftiStream;
+        const DEMO_URL = 'https://fcp-indi.s3.amazonaws.com/data/Projects/HBN/MRI/Site-CBIC/sub-NDARAA396TWZ/anat/sub-NDARAA396TWZ_acq-HCP_T1w.nii.gz';
+        
+        function normalizeData(data) {
+            const array = new Int16Array(data);
+            let min = Infinity;
+            let max = -Infinity;
+            
+            for (let i = 0; i < array.length; i++) {
+                min = Math.min(min, array[i]);
+                max = Math.max(max, array[i]);
+            }
+            
+            const range = max - min;
+            const rgba = new Uint8ClampedArray(array.length * 4);
+            
+            for (let i = 0; i < array.length; i++) {
+                const value = ((array[i] - min) / range) * 255;
+                rgba[i * 4] = value;
+                rgba[i * 4 + 1] = value;
+                rgba[i * 4 + 2] = value;
+                rgba[i * 4 + 3] = 255;
+            }
+            
+            return rgba;
+        }
+
+        document.getElementById('loadHeader').onclick = async () => {
+            const headerInfo = document.getElementById('headerInfo');
+            headerInfo.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch(DEMO_URL);
+                const reader = new NiftiStream(response.body, {
+                    onHeader: (header) => {
+                        headerInfo.textContent = JSON.stringify(header, null, 2);
+                        return true;
+                    },
+                    onError: (error) => {
+                        headerInfo.textContent = `Error: ${error.message}`;
+                    }
+                });
+                
+                await reader.start();
+            } catch (e) {
+                headerInfo.textContent = `Error: ${e.message}`;
+            }
+        };
+
+        document.getElementById('loadSlice').onclick = async () => {
+            const canvas = document.getElementById('slicePreview');
+            const ctx = canvas.getContext('2d');
+            let middleSlice = 0;
+            let dims = [];
+            
+            try {
+                const response = await fetch(DEMO_URL);
+                const reader = new NiftiStream(response.body, {
+                    sliceDimension: 2,
+                    onHeader: (header) => {
+                        dims = header.dims;
+                        middleSlice = Math.floor(dims[3] / 2);
+                        canvas.width = dims[1];
+                        canvas.height = dims[2];
+                    },
+                    onSlice: (data, indices) => {
+                        if (indices[3] === middleSlice) {
+                            const normalized = normalizeData(data);
+                            const imageData = new ImageData(normalized, dims[1], dims[2]);
+                            ctx.putImageData(imageData, 0, 0);
+                            return true;
+                        }
+                    }
+                });
+                
+                await reader.start();
+            } catch (e) {
+                ctx.fillStyle = 'black';
+                ctx.fillText(`Error: ${e.message}`, 10, 20);
+            }
+        };
+
+        let currentReader = null;
+
+        document.getElementById('startLoading').onclick = async () => {
+            const canvas = document.getElementById('progressiveView');
+            const ctx = canvas.getContext('2d');
+            const progress = document.getElementById('loadingProgress');
+            const counter = document.getElementById('sliceCounter');
+            let totalSlices = 0;
+            let dims = [];
+            const SLICES_PER_ROW = 24;
+            const SCALE_FACTOR = 0.1;
+            
+            try {
+                const response = await fetch(DEMO_URL);
+                currentReader = new NiftiStream(response.body, {
+                    sliceDimension: 2,
+                    onHeader: (header) => {
+                        totalSlices = header.dims[3];
+                        dims = header.dims;
+                        const sliceWidth = Math.floor(dims[1] * SCALE_FACTOR);
+                        const sliceHeight = Math.floor(dims[2] * SCALE_FACTOR);
+                        
+                        canvas.width = sliceWidth * SLICES_PER_ROW;
+                        canvas.height = sliceHeight * Math.ceil(totalSlices / SLICES_PER_ROW);
+                        
+                        counter.textContent = `0/${totalSlices}`;
+                        ctx.fillStyle = 'black';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    },
+                    onSlice: (data, indices) => {
+                        const sliceIndex = indices[3];
+                        const normalized = normalizeData(data);
+                        
+                        const tempCanvas = document.createElement('canvas');
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCanvas.width = dims[1];
+                        tempCanvas.height = dims[2];
+                        
+                        const imageData = new ImageData(normalized, dims[1], dims[2]);
+                        tempCtx.putImageData(imageData, 0, 0);
+                        
+                        const row = Math.floor(sliceIndex / SLICES_PER_ROW);
+                        const col = sliceIndex % SLICES_PER_ROW;
+                        const x = col * Math.floor(dims[1] * SCALE_FACTOR);
+                        const y = row * Math.floor(dims[2] * SCALE_FACTOR);
+                        
+                        ctx.drawImage(tempCanvas, 0, 0, dims[1], dims[2], 
+                                    x, y, 
+                                    Math.floor(dims[1] * SCALE_FACTOR), 
+                                    Math.floor(dims[2] * SCALE_FACTOR));
+                        
+                        progress.style.width = `${((sliceIndex + 1) / totalSlices) * 100}%`;
+                        counter.textContent = `${sliceIndex + 1}/${totalSlices}`;
+                    }
+                });
+                
+                await currentReader.start();
+            } catch (e) {
+                ctx.fillStyle = 'black';
+                ctx.fillText(`Error: ${e.message}`, 10, 20);
+            }
+        };
+        
+        document.getElementById('stopLoading').onclick = async () => {
+            if (currentReader) {
+                await currentReader.stop();
+                currentReader = null;
+            }
+        };
+    </script>
+</body>
+</html>
