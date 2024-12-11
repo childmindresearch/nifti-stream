@@ -12,7 +12,7 @@ Based on [NIFTI-Reader-JS](https://github.com/rii-mango/NIFTI-Reader-JS).
 - 🗜️ **Automatic Decompression**: Handles gzipped NIFTI files transparently
 - 🎯 **Selective Loading**: Read only the header, or stop after specific slices
 - 💻 **Browser-Ready**: Works directly in modern browsers
-- 📦 **Lightweight**: Zero dependencies, focused implementation
+- 📦 **Lightweight**: ~17kB minified, no dependencies
 
 ### Live demo
 

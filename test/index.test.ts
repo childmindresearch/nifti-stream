@@ -74,7 +74,6 @@ describe('NiftiStream', () => {
 
       const reader = new NiftiStream(stream, {
         onExtension: (e) => {
-          console.log(e);
           extension = e;
           return true;
         },

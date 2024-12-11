@@ -1,6 +1,6 @@
 /*** Types ***/
 
-import { NiftiExtension } from './nifti-extension';
+import { NiftiExtension } from './niftiExtension';
 
 export type TypedArray =
   | Int8Array

@@ -4,13 +4,12 @@
  */
 
 import { NiftiIOError } from './error';
-import { detectNiftiVersion, NiftiHeader, NiftiVersion } from './nifti';
-import { NiftiExtension } from './nifti-extension';
-import { Nifti1Header } from './nifti1';
-import { Nifti2Header } from './nifti2';
+import { NiftiHeader, NiftiVersion } from './nifti';
+import { NiftiExtension } from './niftiExtension';
+import { NIFTI1_HEADER_SIZE, NIFTI2_HEADER_SIZE } from './niftiConstants';
 import { uncompressStream } from './stream';
 
-export { NiftiVersion, NiftiHeader, NiftiExtension, NiftiIOError, Nifti1Header, Nifti2Header };
+export { NiftiVersion, NiftiHeader, NiftiExtension, NiftiIOError };
 
 /**
  * Configuration options for streaming NIFTI data
@@ -106,7 +105,6 @@ export class NiftiStream {
 
   private buffer: Uint8Array = new Uint8Array(0);
   private bufferOffset = 0;
-  private totalBytesRead = 0; // Add tracking of total bytes read
 
   private async readBytes(length: number): Promise<Uint8Array> {
     if (!this.reader) {
@@ -156,33 +154,23 @@ export class NiftiStream {
   }
 
   private async readHeader(): Promise<NiftiHeader> {
-    // First read enough for NIFTI1 header (348 bytes)
-    const initialHeaderBytes = await this.readBytes(348);
-    const version = detectNiftiVersion(initialHeaderBytes.buffer);
+    // First read enough for NIFTI1 header
+    const initialHeaderBytes = await this.readBytes(NIFTI1_HEADER_SIZE);
+    const peek = NiftiHeader.peekVersion(new DataView(initialHeaderBytes.buffer));
 
-    switch (version) {
-      case NiftiVersion.NIFTI1:
-      case NiftiVersion.NIFTI1_PAIR: {
-        const header = Nifti1Header.fromBytes(initialHeaderBytes.buffer);
-        return header;
-      }
-
-      case NiftiVersion.NIFTI2:
-      case NiftiVersion.NIFTI2_PAIR: {
-        // Need to read additional bytes for NIFTI2 header
-        const remainingBytes = await this.readBytes(540 - 348);
-        // Combine
-        const fullHeaderBytes = new Uint8Array(540);
-        fullHeaderBytes.set(initialHeaderBytes);
-        fullHeaderBytes.set(remainingBytes, 348);
-
-        const header = Nifti2Header.fromBytes(fullHeaderBytes.buffer);
-        return header;
-      }
-
-      case NiftiVersion.NONE:
-        throw new NiftiIOError('Not a valid NIFTI file');
+    if (!peek) {
+      throw new NiftiIOError('Not a valid NIFTI file');
     }
+
+    if (!peek.nifti1) {
+      // Need to read additional bytes for NIFTI2 header
+      const remainingBytes = await this.readBytes(NIFTI2_HEADER_SIZE - NIFTI1_HEADER_SIZE);
+      const fullHeaderBytes = new Uint8Array(NIFTI2_HEADER_SIZE);
+      fullHeaderBytes.set(initialHeaderBytes);
+      fullHeaderBytes.set(remainingBytes, NIFTI1_HEADER_SIZE);
+      return NiftiHeader.parseNifti2(new DataView(fullHeaderBytes.buffer), peek.littleEndian);
+    }
+    return NiftiHeader.parseNifti1(new DataView(initialHeaderBytes.buffer), peek.littleEndian);
   }
 
   private async readExtension(): Promise<NiftiExtension | null> {
@@ -330,9 +318,7 @@ export class NiftiStream {
       }
     } catch (error) {
       if (this.options.onError) {
-        this.options.onError(
-          error
-        );
+        this.options.onError(error);
       }
     } finally {
       this.reader.releaseLock();
