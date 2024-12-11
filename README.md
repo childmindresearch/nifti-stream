@@ -93,7 +93,7 @@ await reader.stop();
 
 ## API Documentation
 
-Full API documentation is available at [username.github.io/nifti-stream](https://childmindresearch.github.io/nifti-stream).
+Full API documentation is available at [childmindresearch.github.io/nifti-stream](https://childmindresearch.github.io/nifti-stream).
 
 ## Contributing
 
