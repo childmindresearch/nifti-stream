@@ -4,12 +4,26 @@
  */
 
 import { NiftiIOError } from './error';
-import { NiftiHeader, NiftiVersion } from './nifti';
+import { NiftiHeader, NiftiVersion } from './niftiHeader';
 import { NiftiExtension } from './niftiExtension';
-import { NIFTI1_HEADER_SIZE, NIFTI2_HEADER_SIZE } from './niftiConstants';
+import {
+  NIFTI1_HEADER_SIZE,
+  NIFTI2_HEADER_SIZE,
+  DataTypeCode,
+  TransformCode,
+  UnitsCode,
+} from './niftiConstants';
 import { uncompressStream } from './stream';
 
-export { NiftiVersion, NiftiHeader, NiftiExtension, NiftiIOError };
+export {
+  NiftiVersion,
+  NiftiHeader,
+  NiftiExtension,
+  NiftiIOError,
+  DataTypeCode,
+  TransformCode,
+  UnitsCode,
+};
 
 /**
  * Configuration options for streaming NIFTI data

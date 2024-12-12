@@ -10,19 +10,60 @@ import {
 } from './niftiConstants';
 import { getStringAt } from './utils';
 
+/**
+ * Enumeration of supported NIfTI file format versions.
+ *
+ * Represents the different versions and variants of the NIfTI (Neuroimaging Informatics Technology Initiative)
+ * file format specification.
+ *
+ * @property NIFTI1 - Single-file NIfTI-1 format
+ * @property NIFTI1_PAIR - Two-file (header + data) NIfTI-1 format
+ * @property NIFTI2 - Single-file NIfTI-2 format
+ * @property NIFTI2_PAIR - Two-file (header + data) NIfTI-2 format
+ * @property NONE - Not a valid NIfTI format
+ */
 export enum NiftiVersion {
-  NIFTI1,
-  NIFTI1_PAIR,
-  NIFTI2,
-  NIFTI2_PAIR,
-  NONE,
+  NIFTI1 = 1,
+  NIFTI1_PAIR = 2,
+  NIFTI2 = 3,
+  NIFTI2_PAIR = 4,
+  NONE = 5,
 }
 
+/**
+ * Information obtained from peeking at a NIfTI file header.
+ *
+ * Contains basic format information that can be determined by examining the initial bytes
+ * of a potential NIfTI file.
+ *
+ * @property {boolean} nifti1 - True if the file appears to be NIfTI-1 format, false if NIfTI-2
+ * @property {boolean} littleEndian - True if the file uses little-endian byte ordering, false for big-endian
+ */
 type NiftiHeaderPeekInfo = {
   nifti1: boolean;
   littleEndian: boolean;
 };
 
+/**
+ * 4x4 affine transformation matrix used in NIfTI headers.
+ *
+ * Represents a 4x4 matrix that specifies the affine transformation from voxel indices
+ * to real-world coordinates (typically in millimeters). The matrix includes rotation,
+ * scaling, shearing, and translation components.
+ *
+ * The matrix is structured as:
+ * - Row 1-3: Linear transformation components (rotation, scaling, shearing)
+ * - Row 4: Translation components in the last column, typically [0,0,0,1] in the other positions
+ *
+ * @example
+ * // Identity transformation matrix
+ * const identityMatrix: AffineMatrix = [
+ *   [1, 0, 0, 0],
+ *   [0, 1, 0, 0],
+ *   [0, 0, 1, 0],
+ *   [0, 0, 0, 1]
+ * ];
+ */
 export type AffineMatrix = [
   [number, number, number, number],
   [number, number, number, number],
@@ -30,6 +71,35 @@ export type AffineMatrix = [
   [number, number, number, number],
 ];
 
+/**
+ * Array representing dimensions or pixel dimensions of a NIfTI volume.
+ * @type
+ * @description
+ * This type is used in two contexts within NIfTI headers:
+ *
+ * 1. As volume dimensions (dim[]):
+ * - Index 0: Number of dimensions (rank) of the dataset (1-7)
+ * - Index 1: Size of dimension 1 (usually x dimension)
+ * - Index 2: Size of dimension 2 (usually y dimension)
+ * - Index 3: Size of dimension 3 (usually z dimension)
+ * - Index 4: Size of dimension 4 (usually time points)
+ * - Index 5-7: Sizes of optional additional dimensions
+ *
+ * 2. As pixel dimensions (pixdim[]):
+ * - Index 0: (not used for pixdims)
+ * - Index 1: Pixel width in dimension 1 (usually x dimension)
+ * - Index 2: Pixel width in dimension 2 (usually y dimension)
+ * - Index 3: Pixel width in dimension 3 (usually z dimension)
+ * - Index 4: Time step duration (TR) for dimension 4
+ * - Index 5-7: Step sizes for optional additional dimensions
+ *
+ * @example
+ * // Volume dimensions for a 3D volume of size 256x256x128
+ * const dims: DimensionArray = [3, 256, 256, 128, 1, 1, 1, 1];
+ *
+ * // Pixel dimensions for 2mm isotropic voxels with 2.5s TR
+ * const pixdims: DimensionArray = [1.0, 2.0, 2.0, 2.0, 2.5, 1.0, 1.0, 1.0];
+ */
 export type DimensionArray = [number, number, number, number, number, number, number, number];
 
 export class NiftiHeader {
@@ -39,13 +109,22 @@ export class NiftiHeader {
   dim_info: number = 0;
 
   /**
-   * Data array dimensions [8]
-   * dim[0] = number of dimensions
-   * dim[1] = size of dimension 1 (x)
-   * dim[2] = size of dimension 2 (y)
-   * dim[3] = size of dimension 3 (z)
-   * dim[4] = size of dimension 4 (time)
-   * dim[5-7] = size of dimensions 5-7
+   * Array representing dimensions of a NIfTI volume.
+   *
+   * Represents the dimensions of a NIfTI volume as an 8-element array where:
+   * - Index 0: Number of dimensions (rank) of the dataset (1-7)
+   * - Index 1: Size of dimension 1 (usually x dimension)
+   * - Index 2: Size of dimension 2 (usually y dimension)
+   * - Index 3: Size of dimension 3 (usually z dimension)
+   * - Index 4: Size of dimension 4 (usually time points)
+   * - Index 5-7: Sizes of optional additional dimensions
+   *
+   * @example
+   * // 3D volume of size 256x256x128
+   * const dims: DimensionArray = [3, 256, 256, 128, 1, 1, 1, 1];
+   *
+   * // 4D volume (fMRI) with 30 time points
+   * const timeSeries: DimensionArray = [4, 64, 64, 32, 30, 1, 1, 1];
    */
   dims: DimensionArray = [0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -76,13 +155,13 @@ export class NiftiHeader {
   slice_start: number = 0;
 
   /**
-   * Grid spacings [8]
-   * pixDims[0] = spacing units
-   * pixDims[1] = x spacing
-   * pixDims[2] = y spacing
-   * pixDims[3] = z spacing
-   * pixDims[4] = time spacing
-   * pixDims[5-7] = additional dimension spacing
+   * Pixel dimensions:
+   * - Index 0: (not used for pixdims)
+   * - Index 1: Pixel width in dimension 1 (usually x dimension)
+   * - Index 2: Pixel width in dimension 2 (usually y dimension)
+   * - Index 3: Pixel width in dimension 3 (usually z dimension)
+   * - Index 4: Time step duration (TR) for dimension 4
+   * - Index 5-7: Step sizes for optional additional dimensions
    */
   pixDims: DimensionArray = [0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -155,6 +234,9 @@ export class NiftiHeader {
    */
   sform_code: number = 0;
 
+  /**
+   * S-Form parameters for spatial transform
+   */
   srow_x: [number, number, number, number] = [0, 0, 0, 0];
   srow_y: [number, number, number, number] = [0, 0, 0, 0];
   srow_z: [number, number, number, number] = [0, 0, 0, 0];
@@ -198,10 +280,10 @@ export class NiftiHeader {
    */
   getNiftiVersion(): NiftiVersion {
     const versions: Record<string, NiftiVersion> = {
-      ni1: NiftiVersion.NIFTI1,
-      'n+1': NiftiVersion.NIFTI1_PAIR,
-      ni2: NiftiVersion.NIFTI2,
-      'n+2': NiftiVersion.NIFTI2_PAIR,
+      'n+1': NiftiVersion.NIFTI1,
+      ni1: NiftiVersion.NIFTI1_PAIR,
+      'n+2': NiftiVersion.NIFTI2,
+      ni2: NiftiVersion.NIFTI2_PAIR,
     };
     return versions[this.magic] || NiftiVersion.NONE;
   }
