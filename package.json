@@ -35,10 +35,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cmi-dair/nifti-stream.git"
+    "url": "git+https://github.com/childmindresearch/nifti-stream.git"
   },
   "bugs": {
-    "url": "https://github.com/cmi-dair/nifti-stream/issues"
+    "url": "https://github.com/childmindresearch/nifti-stream/issues"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
