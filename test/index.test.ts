@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NiftiStream, NiftiHeader, NiftiExtension, NiftiIOError } from '@';
+import { NiftiStream, NiftiHeader, NiftiExtension, NiftiIOError } from '../src';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -57,7 +57,7 @@ describe('NiftiStream', () => {
 
       const reader = new NiftiStream(stream, {
         onError: (e) => {
-          error = e;
+          error = e as NiftiIOError;
         },
       });
 
@@ -168,7 +168,7 @@ describe('NiftiStream', () => {
       let error: NiftiIOError | null = null;
       const reader = new NiftiStream(stream, {
         onError: (e) => {
-          error = e;
+          error = e as NiftiIOError;
         },
       });
 

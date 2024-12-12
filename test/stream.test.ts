@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { gzip } from 'zlib';
 import { promisify } from 'util';
-import { uncompressStream } from '@/stream';
+import { uncompressStream } from '../src/stream';
 
 const gzipAsync = promisify(gzip);
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { NiftiHeader, NiftiVersion } from '@/niftiHeader';
-import { DataTypeCode, TransformCode, UnitsCode } from '@/niftiConstants';
+import { NiftiHeader, NiftiVersion } from '../src/niftiHeader';
+import { DataTypeCode, TransformCode, UnitsCode } from '../src/niftiConstants';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { gunzip } from 'zlib';
@@ -29,9 +29,9 @@ describe('NiftiHeader', () => {
       expect(header.getNiftiVersion()).toBe(NiftiVersion.NIFTI1);
       expect(header.magic).toBe('n+1');
       expect(header.littleEndian).toBeFalsy();
-      expect(header.vox_offset).toBe(352);
+      expect(header.voxOffset).toBe(352);
       expect(header.datatypeCode).toBe(DataTypeCode.UINT8);
-      expect(header.sform_code).toBe(TransformCode.MNI_152);
+      expect(header.sFormCode).toBe(TransformCode.MNI_152);
     });
 
     it('should correctly identify NIfTI-2 format', async () => {
@@ -43,7 +43,7 @@ describe('NiftiHeader', () => {
       expect(header.getNiftiVersion()).toBe(NiftiVersion.NIFTI2);
       expect(header.littleEndian).toBeTruthy();
       expect(header.datatypeCode).toBe(DataTypeCode.FLOAT32);
-      expect(header.sform_code).toBe(TransformCode.MNI_152);
+      expect(header.sFormCode).toBe(TransformCode.MNI_152);
     });
 
     it('should correctly handle paired NIfTI-1 files', async () => {
@@ -55,7 +55,7 @@ describe('NiftiHeader', () => {
       expect(header.getNiftiVersion()).toBe(NiftiVersion.NIFTI1_PAIR);
       expect(header.magic).toBe('ni1');
       expect(header.datatypeCode).toBe(DataTypeCode.FLOAT32);
-      expect(header.sform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.sFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
 
     it('should correctly handle paired NIfTI-2 files', async () => {
@@ -66,7 +66,7 @@ describe('NiftiHeader', () => {
 
       expect(header.getNiftiVersion()).toBe(NiftiVersion.NIFTI2_PAIR);
       expect(header.datatypeCode).toBe(DataTypeCode.FLOAT32);
-      expect(header.sform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.sFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
   });
 
@@ -81,8 +81,8 @@ describe('NiftiHeader', () => {
       expect(Array.from(header.dims)).toEqual([5, 1, 2, 3, 1, 3, 1, 1]);
       expect(header.datatypeCode).toBe(DataTypeCode.UINT8);
       expect(header.numBitsPerVoxel).toBe(8);
-      expect(header.qform_code).toBe(TransformCode.ALIGNED_ANAT);
-      expect(header.sform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.qFormCode).toBe(TransformCode.ALIGNED_ANAT);
+      expect(header.sFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
 
     it('should handle large 5D datasets', async () => {
@@ -94,8 +94,8 @@ describe('NiftiHeader', () => {
       expect(header.dims[0]).toBe(5);
       expect(Array.from(header.dims)).toEqual([5, 256, 256, 170, 1, 3, 1, 1]);
       expect(header.datatypeCode).toBe(DataTypeCode.UINT8);
-      expect(header.qform_code).toBe(TransformCode.ALIGNED_ANAT);
-      expect(header.sform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.qFormCode).toBe(TransformCode.ALIGNED_ANAT);
+      expect(header.sFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
   });
 
@@ -106,8 +106,8 @@ describe('NiftiHeader', () => {
       const peekInfo = NiftiHeader.peekVersion(view);
       const header = NiftiHeader.parse(view, peekInfo!);
 
-      expect(header.qform_code).toBe(TransformCode.TALAIRACH);
-      expect(header.sform_code).toBe(TransformCode.TALAIRACH);
+      expect(header.qFormCode).toBe(TransformCode.TALAIRACH);
+      expect(header.sFormCode).toBe(TransformCode.TALAIRACH);
       expect(header.spatialUnits).toBe(UnitsCode.MM);
     });
 
@@ -135,7 +135,7 @@ describe('NiftiHeader', () => {
       expect(header.littleEndian).toBeFalsy();
       expect(header.datatypeCode).toBe(DataTypeCode.FLOAT32);
       expect(header.dims).toEqual([3, 64, 64, 21, 1, 1, 1, 1]);
-      expect(header.qform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.qFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
 
     it('should handle little-endian float32 files', async () => {
@@ -147,7 +147,7 @@ describe('NiftiHeader', () => {
       expect(header.littleEndian).toBeTruthy();
       expect(header.datatypeCode).toBe(DataTypeCode.FLOAT32);
       expect(header.dims).toEqual([4, 64, 64, 21, 1, 1, 1, 1]);
-      expect(header.qform_code).toBe(TransformCode.SCANNER_ANAT);
+      expect(header.qFormCode).toBe(TransformCode.SCANNER_ANAT);
     });
   });
 
@@ -160,11 +160,11 @@ describe('NiftiHeader', () => {
 
       expect(header.dims).toEqual([4, 161, 191, 151, 1, 0, 0, 0]);
       expect(header.datatypeCode).toBe(DataTypeCode.UINT8);
-      expect(header.qform_code).toBe(TransformCode.TALAIRACH);
-      expect(header.sform_code).toBe(TransformCode.TALAIRACH);
-      expect(header.quatern_b).toBe(0);
-      expect(header.quatern_c).toBe(0);
-      expect(header.quatern_d).toBe(1);
+      expect(header.qFormCode).toBe(TransformCode.TALAIRACH);
+      expect(header.sFormCode).toBe(TransformCode.TALAIRACH);
+      expect(header.quaternB).toBe(0);
+      expect(header.quaternC).toBe(0);
+      expect(header.quaternD).toBe(1);
     });
 
     it('should reject invalid NIfTI files', async () => {
