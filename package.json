@@ -1,5 +1,6 @@
 {
-  "name": "nifti-stream",
+  "name": "@cmi-dair/nifti-stream",
+  "displayName": "nifti-stream",
   "type": "module",
   "version": "0.1.0",
   "description": "Async streaming NIFTI file reader",
