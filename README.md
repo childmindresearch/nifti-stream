@@ -21,7 +21,7 @@ See our [live demo](https://childmindresearch.github.io/nifti-stream/demo) and c
 ## Installation
 
 ```bash
-npm install nifti-stream
+npm install @cmi-dair/nifti-stream
 ```
 
 ## Quick Start
