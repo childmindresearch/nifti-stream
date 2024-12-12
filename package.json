@@ -1,7 +1,7 @@
 {
   "name": "nifti-stream",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Async streaming NIFTI file reader",
   "scripts": {
     "build": "node build.js",
@@ -26,14 +26,14 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "@typescript-eslint/eslint-plugin": "^8.17.0",
-    "@typescript-eslint/parser": "^8.17.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.4.2",
-    "typedoc": "^0.27.3",
+    "typedoc": "^0.27.4",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }

@@ -36,7 +36,7 @@ interface NiftiStreamOptions {
    * - 4: Stream 4D volumes (X-Y-Z-T volumes)
    * - undefined: Stream raw chunks of data without dimensional organization
    */
-  sliceDimension?: 2 | 3 | 4;
+  sliceDimension?: number;
 
   /**
    * Callback executed when the NIFTI header is parsed
