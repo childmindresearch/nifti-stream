@@ -24,8 +24,22 @@
     "require": "./dist/index.cjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "package.json"
   ],
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmi-dair/nifti-stream.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cmi-dair/nifti-stream/issues"
+  },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
